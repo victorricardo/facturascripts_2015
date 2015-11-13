@@ -811,14 +811,25 @@ class admin_home extends fs_controller
    {
       if( function_exists('curl_init') )
       {
+         $proxy = ''; // proxydomain:port
+         $proxyauth = ''; // 'user:pass'
+         $timeou = 6000;
+         
+         set_time_limit(0);
+         
          $ch = curl_init();
          curl_setopt($ch, CURLOPT_URL, $url);
+         if ($proxy != '') curl_setopt($ch, CURLOPT_PROXY, $proxy);
+         if ($proxyauth != '') curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyauth);
          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+         if ($timeou > 0) curl_setopt($ch,CURLOPT_TIMEOUT, $timeou);
          $data = curl_exec($ch);
          $info = curl_getinfo($ch);
+         
+         set_time_limit(30);
          
          if($info['http_code'] == 301 OR $info['http_code'] == 302)
          {
